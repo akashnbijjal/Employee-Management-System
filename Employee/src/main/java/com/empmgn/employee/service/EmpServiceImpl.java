@@ -1,12 +1,16 @@
 package com.empmgn.employee.service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.empmgn.employee.exception.EmployeeAlreadyExsits;
+import com.empmgn.employee.exception.EmployeeIdNotfound;
 import com.empmgn.employee.model.Department;
 import com.empmgn.employee.model.Employee;
 import com.empmgn.employee.repository.Emprepository;
@@ -30,14 +34,17 @@ public class EmpServiceImpl implements EmpService {
 	}
 
 	@Override
-	public List<Employee> allemployees() {
-		List<Employee> list = repo.findAll();
+	public Map<Long, List<Employee>> allemployees() {
+
+		Map<Long, List<Employee>> list = repo.findAll().stream()
+				.sorted((e1, e2) -> e1.getEmpname().compareTo(e2.getEmpname()))
+				.collect(Collectors.groupingBy(Employee::getDepartmentId, Collectors.toList()));
 		return list;
 	}
 
 	@Override
-	public Employee getempbyid(long EmpId) {
-		Employee employee = repo.findById(EmpId).get();
+	public Employee getempbyid(long empId) {
+		Employee employee = repo.findById(empId).get();
 		Department department = restTemplate
 				.getForObject("http://localhost:8082/dept/get/" + employee.getDepartmentId(), Department.class);
 		employee.setDepartmentdetails(department);
@@ -52,7 +59,22 @@ public class EmpServiceImpl implements EmpService {
 
 	public List<Employee> getbydepartmentId(long departmentId) {
 		List<Employee> list = repo.findByDepartmentId(departmentId);
+		list.sort(Comparator.comparing(Employee::getEmpname));
+		// list.sort((e1, e2) -> e1.getEmpname().compareTo(e2.getEmpname())); //old
+		// method
 		return list;
+	}
+
+	@Override
+	public String deletebyid(long empId) {
+		if (repo.existsById(empId)) {
+			repo.deleteById(empId);
+			return "Employee deleted sucessfully";
+
+		} else {
+			throw new EmployeeIdNotfound("Employee ID not found: " + empId);
+		}
+
 	}
 
 }

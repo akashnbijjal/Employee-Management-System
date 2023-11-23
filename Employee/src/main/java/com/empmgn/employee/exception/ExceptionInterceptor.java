@@ -38,4 +38,11 @@ public class ExceptionInterceptor extends ResponseEntityExceptionHandler {
 		return handleExceptionInternal(ex, errorDetails, headers, status, request);
 	}
 
+	@ExceptionHandler(EmployeeIdNotfound.class)
+	public final ResponseEntity<ErrorDetails> employeealreadyexists(EmployeeIdNotfound ex, WebRequest request)
+			throws EmployeeIdNotfound {
+		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMsg(), request.getDescription(false));
+		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
+
 }
