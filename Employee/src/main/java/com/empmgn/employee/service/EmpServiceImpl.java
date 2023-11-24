@@ -1,6 +1,7 @@
 package com.empmgn.employee.service;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -75,6 +76,17 @@ public class EmpServiceImpl implements EmpService {
 			throw new EmployeeIdNotfound("Employee ID not found: " + empId);
 		}
 
+	}
+
+	public Map<String, List<Employee>> listofactiveandinactiveemployees() {
+		List<Employee> allEmployees = repo.findAll();
+		Map<Boolean, List<Employee>> activeAndInactiveEmployees = allEmployees.stream()
+				.collect(Collectors.partitioningBy(employee -> "active".equalsIgnoreCase(employee.getIsactive())));
+
+		HashMap<String, List<Employee>> hashMap = new HashMap<>();
+		hashMap.put("active", activeAndInactiveEmployees.getOrDefault(true, List.of()));
+		hashMap.put("inactive", activeAndInactiveEmployees.getOrDefault(false, List.of()));
+		return hashMap;
 	}
 
 }

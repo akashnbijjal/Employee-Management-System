@@ -67,4 +67,11 @@ public class Empcontroller {
 		return new ResponseEntity<String>(delete, HttpStatus.ACCEPTED);
 	}
 
+	
+	@GetMapping("listofactiveandinactive")
+	public ResponseEntity<?> listofactiveandinactiveemployees() {
+		Map<String, List<Employee>> map = service.listofactiveandinactiveemployees();
+		return new ResponseEntity<>(map, HttpStatus.ACCEPTED);
+	}
+
 }

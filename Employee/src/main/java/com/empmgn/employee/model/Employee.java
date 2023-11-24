@@ -31,7 +31,7 @@ public class Employee {
 	private String phoneNumber;
 	private Date hireDate;
 	private double salary;
-	private boolean isActive;
+	private String isactive;
 	private long departmentId;
 	
 	@Transient
